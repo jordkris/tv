@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Video TV</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <!-- <link href="https://vjs.zencdn.net/7.2.3/video-js.css" rel="stylesheet"> -->
+    <link href="https://cdn.plyr.io/3.7.7/plyr.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" /> -->
+    <!-- <link href="assets/css/datatable-custom.css" rel="stylesheet"> -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.jqueryui.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.2.1/video-js.min.css" /> -->
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+
+            <a href="#header" class="logo d-flex align-items-center  me-auto me-lg-0">
+                <i class="bi bi-tv"></i>
+                <h1>All TV</h1>
+            </a>
+
+            <div class="header-social-links">
+                <a href="https://profile.jordkris.com" target="_blank"><i class="bi bi-person-circle"></i></a>
+            </div>
+            <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+            <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+
+        </div>
+    </header>
+    <!-- End Header -->
+
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="hero d-flex flex-column justify-content-center align-items-center" data-aos="fade" data-aos-delay="1500">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <h2>List of All TV</h2>
+                    <a href="#main" class="btn-get-started">Get started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Hero Section -->
+
+    <main id="main" data-aos="fade" data-aos-delay="1500">
+
+        <!-- ======= Gallery Section ======= -->
+        <section id="gallery" class="gallery">
+            <div class="container-fluid">
+                <!-- <div id="all-tv" class="row gy-4 justify-content-center"></div> -->
+                <table id="all-tv" class="table display table-stripped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Channel</th>
+                            <th>Logo</th>
+                            <th>Country</th>
+                            <th>Stream Link</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </section>
+        <!-- End Gallery Section -->
+
+    </main>
+    <!-- End #main -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="streamModal" tabindex="-1" role="dialog" aria-labelledby="streamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="streamModalLabel" style="color:black;"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- <video id="streamTv" class="video-js vjs-default-skin" width="400" height="300" controls></video> -->
+                    <video id="streamTV" controls crossorigin playsinline>
+                        <source type="application/x-mpegURL" />
+                    </video>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast-->
+    <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+        <div id="streamToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
+            <div class="toast-header">
+                <img src="assets/img/favicon.png" class="rounded mr-2" alt="..." width="15">
+                <strong class="mr-auto ml-1">tv.jordkris.com</strong>
+                <small>Now</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body" style="background-color: aliceblue; color: black;"></div>
+        </div>
+    </div>
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            List of ALL Tv
+        </div>
+    </footer>
+    <!-- End Footer -->
+
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <div id="preloader">
+        <div class="line"></div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <!-- <video id="hls-example" class="video-js vjs-default-skin" width="400" height="300" controls>
+        <source type="application/x-mpegURL" src="https://v2.siar.us/aditv/livestream/chunks.m3u8" />
+    </video> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.jqueryui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.2.1/video.min.js"></script> -->
+    <!-- <script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+    <script src="https://vjs.zencdn.net/7.2.3/video.js"></script> -->
+    <script src="https://cdn.plyr.io/3.7.7/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>
