@@ -1328,3 +1328,9 @@ span>.ui-state-disabled {
     background-color: aliceblue;
     border-radius: 10px;
 }
+
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+}
