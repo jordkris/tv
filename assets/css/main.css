@@ -1272,6 +1272,7 @@ input {
     border: 1px solid black;
     position: relative;
     border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .magic-image {
