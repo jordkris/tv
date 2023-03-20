@@ -1323,3 +1323,8 @@ input {
         transform: rotate(360deg);
     }
 }
+
+span>.ui-state-disabled {
+    background-color: aliceblue;
+    border-radius: 10px;
+}

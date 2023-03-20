@@ -71,18 +71,20 @@
         <!-- ======= Gallery Section ======= -->
         <section id="gallery" class="gallery">
             <div class="container-fluid">
-                <!-- <div id="all-tv" class="row gy-4 justify-content-center"></div> -->
-                <table id="all-tv" class="table display table-stripped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Channel</th>
-                            <th>Logo</th>
-                            <th>Country</th>
-                            <th>Stream Link</th>
-                        </tr>
-                    </thead>
-                </table>
+                <div class="table-responsive">
+                    <!-- <div id="all-tv" class="row gy-4 justify-content-center"></div> -->
+                    <table id="all-tv" class="table display table-stripped">
+                        <thead>
+                            <tr style="background-color: aliceblue;">
+                                <th>#</th>
+                                <th>Channel</th>
+                                <th>Logo</th>
+                                <th>Country</th>
+                                <th>Stream Link</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </section>
         <!-- End Gallery Section -->
@@ -114,14 +116,16 @@
 
     <!-- Toast-->
     <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
-        <div id="streamToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
-            <div class="toast-header">
-                <img src="assets/img/favicon.png" class="rounded mr-2" alt="..." width="15">
-                <strong class="mr-auto ml-1">tv.jordkris.com</strong>
-                <small>Now</small>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+        <div id="streamToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000">
+            <div class="toast-header d-flex justify-content-between">
+                <div>
+                    <img src="assets/img/favicon.png" class="rounded mr-2" alt="..." width="15">
+                    <strong>tv.jordkris.com</strong>
+                </div>
+                <div>
+                    <small>Now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
             </div>
             <div class="toast-body" style="background-color: aliceblue; color: black;"></div>
         </div>

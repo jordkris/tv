@@ -45,13 +45,14 @@ let check = (id, channelName, source) => {
             `);
         },
         success: (res) => {
-            $('.toast-body').html('This stream is available now');
-            $('#streamToast').toast({ delay: 2000 });
+            $('.toast-body').html(`Channel <b>${channelName}</b> is <span class="text-success">available now</span>`);
+            $('#streamToast').toast({ delay: 4000 });
             $('#streamToast').toast('show');
             $(`#${id}`).html(`<button class="btn btn-success" onclick="play('${channelName}','${source}');" data-toggle="modal" data-target="#streamModal">Stream <i class="bi bi-box-arrow-up-right"></i></button>`);
         },
         error: (err) => {
-            $('.toast-body').html('This stream is not available now');
+            $('.toast-body').html(`Channel <b>${channelName}</b> is <span class="text-danger">not available now</span>`);
+            $('#streamToast').toast({ delay: 4000 });
             $('#streamToast').toast('show');
             $(`#${id}`).html(`<p class="text text-danger">Not Available</p>`);
         }
