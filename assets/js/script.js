@@ -93,6 +93,10 @@ $('#streamModal').on('hidden.bs.modal', function() {
     $('video').trigger('pause');
 });
 
+$('#checkAllStatus').click(() => {
+    $('.checkStatus').click();
+});
+
 (async() => {
     let channels = await getChannels();
     let streams = await getStreams();
@@ -111,7 +115,8 @@ $('#streamModal').on('hidden.bs.modal', function() {
                     </div>
                 `;
             let country = `${countryData.flag} ${countryData.name}`;
-            let stream = `<div id="stream-${counter}"><button class="btn btn-primary" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            streamData.url = streamData.url.replace('http://', 'https://');
+            let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 '',
                 channel,
