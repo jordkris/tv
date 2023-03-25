@@ -1,3 +1,5 @@
+commentBox('5639883179687936-proj')
+
 let promise = async(url) => {
     return new Promise((resolve, reject) => {
         $.ajax({
