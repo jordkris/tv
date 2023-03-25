@@ -1338,3 +1338,7 @@ button.close {
     background-color: transparent;
     border: 0;
 }
+
+.custom-comment {
+    background-color: white;
+}
