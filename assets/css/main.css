@@ -15,6 +15,10 @@
     --color-secondary: #161718;
 }
 
+div {
+    color: white !important;
+}
+
 
 /* Smooth scroll behavior */
 
