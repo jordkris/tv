@@ -1267,7 +1267,7 @@ input {
 }
 
 .magic-box {
-    /* width: 100px; */
+    width: 200px;
     height: 100px;
     border: 1px solid black;
     position: relative;
@@ -1333,9 +1333,4 @@ button.close {
     padding: 0;
     background-color: transparent;
     border: 0;
-}
-
-#checkAllStatus {
-    left: 4%;
-    cursor: pointer;
 }

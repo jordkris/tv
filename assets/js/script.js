@@ -12,6 +12,7 @@ let promise = async(url) => {
         });
     });
 }
+
 let getChannels = async() => {
     return await promise('https://iptv-org.github.io/api/channels.json');
 }
@@ -103,22 +104,23 @@ $('#checkAllStatus').click(() => {
     let countries = await getCountries();
 
     let t = $('#all-tv').DataTable();
-    let counter = 0;
+    let counter = 1;
     channels.forEach((channelData) => {
         let streamData = streams.filter(stream => stream.channel === channelData.id)[0] || '';
         let countryData = countries.filter(country => country.code === channelData.country)[0] || '';
         if (streamData && countryData && !channelData.is_nsfw) {
-            let channel = channelData.name;
+            let channel = channelData.website ? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>` : channelData.name;
             let logo = `
                     <div class="magic-box">
-                        <img src="${channelData.logo}" class="magic-image" />
+                        <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
                     </div>
                 `;
             let country = `${countryData.flag} ${countryData.name}`;
             streamData.url = streamData.url.replace('http://', 'https://');
+            channelData.name = channelData.name.replace(`'`, ``);
             let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
-                '',
+                counter,
                 channel,
                 logo,
                 country,
@@ -127,10 +129,11 @@ $('#checkAllStatus').click(() => {
             counter++;
         }
     });
+    t.draw();
 
-    t.on('order.dt search.dt', () => {
-        t.column(0, { search: 'applied', order: 'applied' }).nodes().each((cell, i) => {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
+    // t.on('order.dt search.dt', () => {
+    //     t.column(0, { search: 'applied', order: 'applied' }).nodes().each((cell, i) => {
+    //         cell.innerHTML = i + 1;
+    //     });
+    // }).draw();
 })();
