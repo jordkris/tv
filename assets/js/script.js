@@ -105,7 +105,11 @@ $('#checkAllStatus').click(() => {
     let streams = await getStreams();
     let countries = await getCountries();
 
-    let t = $('#all-tv').DataTable();
+    let t = $('#all-tv').DataTable({
+        initComplete: () => {
+            $('#loading').hide();
+        }
+    });
     let counter = 1;
     channels.forEach((channelData) => {
         let streamData = streams.filter(stream => stream.channel === channelData.id)[0] || '';
