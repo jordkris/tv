@@ -1338,3 +1338,10 @@ button.close {
 .custom-comment {
     background-color: white;
 }
+
+thead tr:first-child th {
+    position: sticky;
+    z-index: 12;
+    top: 0;
+    background: white;
+}
