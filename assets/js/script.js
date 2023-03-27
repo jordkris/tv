@@ -107,7 +107,7 @@ $('#checkAllStatus').click(() => {
 
     let t = $('#all-tv').DataTable({
         initComplete: () => {
-            $('#loading').hide();
+            $('#loading').remove();
         }
     });
     let counter = 1;
@@ -136,10 +136,4 @@ $('#checkAllStatus').click(() => {
         }
     });
     t.draw();
-
-    // t.on('order.dt search.dt', () => {
-    //     t.column(0, { search: 'applied', order: 'applied' }).nodes().each((cell, i) => {
-    //         cell.innerHTML = i + 1;
-    //     });
-    // }).draw();
 })();
