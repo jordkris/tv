@@ -1,6 +1,6 @@
 commentBox('5639883179687936-proj')
 
-let promise = async(url) => {
+let promise=async (url) => {
     return new Promise((resolve, reject) => {
         $.ajax({
             url: url,
@@ -15,28 +15,33 @@ let promise = async(url) => {
     });
 }
 
-let getChannels = async() => {
+let getChannels=async () => {
     return await promise('https://iptv-org.github.io/api/channels.json');
 }
 
-let getStreams = async() => {
+let getStreams=async () => {
     return await promise('https://iptv-org.github.io/api/streams.json');
 }
 
-let getCountries = async() => {
+let getCountries=async () => {
     return await promise('https://iptv-org.github.io/api/countries.json');
 }
 
-let updateQuality = (newQuality) => {
+let getHostname=(url) => {
+    let { hostname }=new URL(url);
+    return hostname;
+}
+
+let updateQuality=(newQuality) => {
     window.hls.levels.forEach((level, levelIndex) => {
-        if (level.height === newQuality) {
-            console.log("Found quality match with " + newQuality);
-            window.hls.currentLevel = levelIndex;
+        if (level.height===newQuality) {
+            console.log("Found quality match with "+newQuality);
+            window.hls.currentLevel=levelIndex;
         }
     });
 }
 
-let check = (id, channelName, source) => {
+let check=(id, channelName, source) => {
     $.ajax({
         url: source,
         type: 'GET',
@@ -62,37 +67,37 @@ let check = (id, channelName, source) => {
     });
 }
 
-let video = document.querySelector("video");
-let player = new Plyr('#streamTV');
+let video=document.querySelector("video");
+let player=new Plyr('#streamTV');
 
-let play = (channelName, source) => {
+let play=(channelName, source) => {
     $('#streamModalLabel').html(channelName);
-    const defaultOptions = {};
+    const defaultOptions={};
 
     if (Hls.isSupported()) {
-        const hls = new Hls();
+        const hls=new Hls();
         hls.loadSource(source);
-        hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 
-            const availableQualities = hls.levels.map((l) => l.height)
+            const availableQualities=hls.levels.map((l) => l.height)
 
-            defaultOptions.quality = {
+            defaultOptions.quality={
                 default: availableQualities[0],
                 options: availableQualities,
                 forced: true,
                 onChange: (e) => updateQuality(e),
             }
-            player = new Plyr(video, defaultOptions);
+            player=new Plyr(video, defaultOptions);
         });
         hls.attachMedia(video);
-        window.hls = hls;
+        window.hls=hls;
     } else {
-        player = new Plyr(video, defaultOptions);
+        player=new Plyr(video, defaultOptions);
     }
     player.play();
 }
 
-$('#streamModal').on('hidden.bs.modal', function() {
+$('#streamModal').on('hidden.bs.modal', function () {
     $('video').trigger('pause');
 });
 
@@ -100,37 +105,55 @@ $('#checkAllStatus').click(() => {
     $('.checkStatus').click();
 });
 
-(async() => {
-    let channels = await getChannels();
-    let streams = await getStreams();
-    let countries = await getCountries();
+(async () => {
+    let channels=await getChannels();
+    let streams=await getStreams();
+    let countries=await getCountries();
 
-    let t = $('#all-tv').DataTable({
+    let t=$('#all-tv').DataTable({
         initComplete: () => {
             $('#loading').remove();
         }
     });
-    let counter = 1;
+    let counter=1;
     channels.forEach((channelData) => {
-        let streamData = streams.filter(stream => stream.channel === channelData.id)[0] || '';
-        let countryData = countries.filter(country => country.code === channelData.country)[0] || '';
+        let streamData=streams.filter(stream => stream.channel===channelData.id)[0]||'';
+        let countryData=countries.filter(country => country.code===channelData.country)[0]||'';
         // if (streamData && countryData && !channelData.is_nsfw) {
-        if (streamData && countryData && channelData.is_nsfw) {
-            let channel = channelData.website ? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>` : channelData.name;
-            let logo = `
+        if (streamData&&countryData&&channelData.is_nsfw) {
+            let channel=channelData.website? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>`:channelData.name;
+            let logo=`
                     <div class="magic-box">
                         <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
                     </div>
                 `;
-            let country = `${countryData.flag} ${countryData.name}`;
-            streamData.url = streamData.url.replace('http://', 'https://');
-            channelData.name = channelData.name.replace(`'`, ``);
-            let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            let country=`${countryData.flag} ${countryData.name}`;
+            streamData.url=streamData.url.replace('http://', 'https://');
+            channelData.name=channelData.name.replace(`'`, ``);
+            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
                 channel,
                 logo,
                 country,
+                stream
+            ]);
+            counter++;
+        }
+    });
+    streams.forEach((streamData) => {
+        if (!streamData.channel && streamData.url) {
+            let logo=`
+                <div class="magic-box">
+                    <img src="" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
+                </div>
+            `;
+            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${getHostname(streamData.url)}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            t.row.add([
+                counter,
+                getHostname(streamData.url),
+                logo,
+                'Unknown',
                 stream
             ]);
             counter++;
