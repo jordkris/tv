@@ -114,7 +114,8 @@ $('#checkAllStatus').click(() => {
     channels.forEach((channelData) => {
         let streamData = streams.filter(stream => stream.channel === channelData.id)[0] || '';
         let countryData = countries.filter(country => country.code === channelData.country)[0] || '';
-        if (streamData && countryData && !channelData.is_nsfw) {
+        // if (streamData && countryData && !channelData.is_nsfw) {
+        if (streamData && countryData) {
             let channel = channelData.website ? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>` : channelData.name;
             let logo = `
                     <div class="magic-box">
