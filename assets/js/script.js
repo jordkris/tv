@@ -142,7 +142,8 @@ $('#checkAllStatus').click(() => {
         }
     });
     streams.forEach((streamData) => {
-        if (!streamData.channel && streamData.url) {
+        // if (!streamData.channel && streamData.url) {
+        if (streamData.url) {
             let logo=`
                 <div class="magic-box">
                     <img src="" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
