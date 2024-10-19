@@ -113,7 +113,11 @@ $('#checkAllStatus').click(() => {
     let t=$('#all-tv').DataTable({
         initComplete: () => {
             $('#loading').remove();
-        }
+        },
+        lengthMenu: [
+            [10, 25, 50, 100, 500, 1000],
+            [10, 25, 50, 100, 500, 1000]
+        ]
     });
     let counter=1;
     channels.forEach((channelData) => {
