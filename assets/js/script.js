@@ -27,11 +27,6 @@ let getCountries=async () => {
     return await promise('https://iptv-org.github.io/api/countries.json');
 }
 
-let getHostname=(url) => {
-    let { hostname }=new URL(url);
-    return hostname;
-}
-
 let updateQuality=(newQuality) => {
     window.hls.levels.forEach((level, levelIndex) => {
         if (level.height===newQuality) {
@@ -123,8 +118,7 @@ $('#checkAllStatus').click(() => {
     channels.forEach((channelData) => {
         let streamData=streams.filter(stream => stream.channel===channelData.id)[0]||'';
         let countryData=countries.filter(country => country.code===channelData.country)[0]||'';
-        // if (streamData && countryData && !channelData.is_nsfw) {
-        if (streamData&&countryData&&channelData.is_nsfw) {
+        if (streamData && countryData) {
             let channel=channelData.website? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>`:channelData.name;
             let logo=`
                     <div class="magic-box">
@@ -146,17 +140,19 @@ $('#checkAllStatus').click(() => {
         }
     });
     streams.forEach((streamData) => {
-        // if (!streamData.channel && streamData.url) {
-        if (streamData.url) {
+        if (!streamData.channel && streamData.url) {
+            // console.log(streamData.url);
+            let url = new URL(streamData.url);
+            let channel = `<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
             let logo=`
                 <div class="magic-box">
-                    <img src="" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
+                    <img src="/assets/img/no-image.png" class="magic-image" />
                 </div>
             `;
-            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${getHostname(streamData.url)}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channel}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
-                getHostname(streamData.url),
+                channel,
                 logo,
                 'Unknown',
                 stream
