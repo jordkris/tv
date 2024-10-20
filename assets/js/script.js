@@ -122,7 +122,7 @@ $('#checkAllStatus').click(() => {
             let channel=channelData.website? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>`:channelData.name;
             let logo=`
                     <div class="magic-box">
-                        <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/assets/img/no-image.png';" />
+                        <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/tv/assets/img/no-image.png';" />
                     </div>
                 `;
             let country=`${countryData.flag} ${countryData.name}`;
