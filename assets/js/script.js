@@ -149,7 +149,7 @@ $('#checkAllStatus').click(() => {
                     <img src="/assets/img/no-image.png" class="magic-image" />
                 </div>
             `;
-            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channel}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${url.hostname}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
                 channel,
