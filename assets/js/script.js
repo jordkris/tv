@@ -141,12 +141,11 @@ $('#checkAllStatus').click(() => {
     });
     streams.forEach((streamData) => {
         if (!streamData.channel && streamData.url) {
-            // console.log(streamData.url);
             let url = new URL(streamData.url);
             let channel = `<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
             let logo=`
                 <div class="magic-box">
-                    <img src="/assets/img/no-image.png" class="magic-image" />
+                    <img src="/tv/assets/img/no-image.png" class="magic-image"  />
                 </div>
             `;
             let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${url.hostname}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
