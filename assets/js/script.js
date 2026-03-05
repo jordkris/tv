@@ -117,7 +117,8 @@ let play=(channelName, source) => {
             // const duration=(data.frag.stats.loading.end-data.frag.stats.loading.first)/1000;
             const now=Date.now();
             const duration=(now-fragStartTime)/1000;
-            const speed=duration>0? bytes/duration:0;
+            fragStartTime=Date.now();
+            const speed=duration>0? (bytes/duration):0;
             const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
             const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
             $("#total").text(formatBytes(totalBytes));
@@ -125,7 +126,6 @@ let play=(channelName, source) => {
             $("#bitrate").text(bitrate.toFixed(0)+" kbps");
             $("#buffer").text(buffer.toFixed(2)+" s");
             $("#frag").text(formatBytes(bytes));
-
         });
         hls.attachMedia(video);
         window.hls=hls;
@@ -138,6 +138,8 @@ let play=(channelName, source) => {
 
 $('#streamModal').on('hidden.bs.modal', function () {
     $('video').trigger('pause');
+    totalBytes=0;
+    fragStartTime=0;
 });
 
 $('#checkAllStatus').click(() => {
