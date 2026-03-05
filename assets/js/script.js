@@ -36,6 +36,26 @@ let updateQuality=(newQuality) => {
     });
 }
 
+let formatBytes=(bytes) => {
+    const units=["B", "KB", "MB", "GB", "TB"];
+    let i=0;
+    while (bytes>=1000&&i<units.length-1) {
+        bytes/=1000;
+        i++;
+    }
+    return bytes.toFixed(2)+" "+units[i];
+}
+
+let formatSpeed=(bytesPerSec) => {
+    const units=["B/s", "KB/s", "MB/s", "GB/s"];
+    let i=0;
+    while (bytesPerSec>=1000&&i<units.length-1) {
+        bytesPerSec/=1000;
+        i++;
+    }
+    return bytesPerSec.toFixed(2)+" "+units[i];
+}
+
 let check=(id, channelName, source) => {
     $.ajax({
         url: source,
@@ -64,13 +84,18 @@ let check=(id, channelName, source) => {
 
 let video=document.querySelector("video");
 let player=new Plyr('#streamTV');
+let totalBytes=0;
 
 let play=(channelName, source) => {
     $('#streamModalLabel').html(channelName);
     const defaultOptions={};
 
     if (Hls.isSupported()) {
-        const hls=new Hls();
+        console.log('Hls supported');
+        const hls=new Hls({
+            enableWorker: true,
+            lowLatencyMode: true
+        });
         hls.loadSource(source);
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 
@@ -84,9 +109,26 @@ let play=(channelName, source) => {
             }
             player=new Plyr(video, defaultOptions);
         });
+        hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+            // console.log(event);
+            // console.log(data);
+            const bytes=data.frag.stats.loaded;
+            totalBytes+=bytes;
+            const duration=(data.frag.stats.loading.end-data.frag.stats.loading.first)/1000;
+            const speed=duration>0? (bytes/duration)/1024:0;
+            const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
+            const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
+            $("#total").text(formatBytes(totalBytes));
+            $("#speed").text(formatSpeed(speed*1024));
+            $("#bitrate").text(bitrate.toFixed(0)+" kbps");
+            $("#buffer").text(buffer.toFixed(2)+" s");
+            $("#frag").text(formatBytes(bytes));
+
+        });
         hls.attachMedia(video);
         window.hls=hls;
     } else {
+        console.log('Hls not supported');
         player=new Plyr(video, defaultOptions);
     }
     player.play();
@@ -118,7 +160,7 @@ $('#checkAllStatus').click(() => {
     channels.forEach((channelData) => {
         let streamData=streams.filter(stream => stream.channel===channelData.id)[0]||'';
         let countryData=countries.filter(country => country.code===channelData.country)[0]||'';
-        if (streamData && countryData) {
+        if (streamData&&countryData) {
             let channel=channelData.website? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>`:channelData.name;
             let logo=`
                     <div class="magic-box">
@@ -140,9 +182,9 @@ $('#checkAllStatus').click(() => {
         }
     });
     streams.forEach((streamData) => {
-        if (!streamData.channel && streamData.url) {
-            let url = new URL(streamData.url);
-            let channel = `<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
+        if (!streamData.channel&&streamData.url) {
+            let url=new URL(streamData.url);
+            let channel=`<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
             let logo=`
                 <div class="magic-box">
                     <img src="/tv/assets/img/no-image.png" class="magic-image"  />
