@@ -85,7 +85,7 @@ let check=(id, channelName, source) => {
 let video=document.querySelector("video");
 let player=new Plyr('#streamTV');
 let totalBytes=0;
-
+let fragStartTime=0;
 let play=(channelName, source) => {
     $('#streamModalLabel').html(channelName);
     const defaultOptions={};
@@ -114,12 +114,14 @@ let play=(channelName, source) => {
             // console.log(data);
             const bytes=data.frag.stats.loaded;
             totalBytes+=bytes;
-            const duration=(data.frag.stats.loading.end-data.frag.stats.loading.first)/1000;
-            const speed=duration>0? (bytes/duration)/1024:0;
+            // const duration=(data.frag.stats.loading.end-data.frag.stats.loading.first)/1000;
+            const now=Date.now();
+            const duration=(now-fragStartTime)/1000;
+            const speed=duration>0? bytes/duration:0;
             const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
             const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
             $("#total").text(formatBytes(totalBytes));
-            $("#speed").text(formatSpeed(speed*1024));
+            $("#speed").text(formatSpeed(speed));
             $("#bitrate").text(bitrate.toFixed(0)+" kbps");
             $("#buffer").text(buffer.toFixed(2)+" s");
             $("#frag").text(formatBytes(bytes));
