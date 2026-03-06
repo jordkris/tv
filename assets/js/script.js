@@ -97,7 +97,8 @@ let video=document.querySelector("video");
 let player=new Plyr('#streamTV');
 let totalBytes=0;
 let fragStartTime=0;
-let startTime = Date.now();
+let startTime;
+let timer;
 let play=(channelName, source) => {
     $('#streamModalLabel').html(channelName);
     const defaultOptions={};
@@ -121,6 +122,7 @@ let play=(channelName, source) => {
             }
             player=new Plyr(video, defaultOptions);
         });
+        startTime=Date.now();
         hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
             const bytes=data.frag.stats.loaded;
             totalBytes+=bytes;
@@ -130,12 +132,14 @@ let play=(channelName, source) => {
             const speed=duration>0? (bytes/duration):0;
             const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
             const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
-            const elapsedTime = (Date.now() - startTime) / 1000;
+            timer=setInterval(() => {
+                let elapsedTime=(Date.now()-startTime)/1000;
+                $("#elapsedTime").text(formatElapsedTime(elapsedTime));
+            }, 1000);
             $("#total").text(formatBytes(totalBytes));
             $("#frag").text(formatBytes(bytes));
             $("#duration").text(duration.toFixed(3)+' s');
             $("#speed").text(formatSpeed(speed));
-            $("#elapsedTime").text(formatElapsedTime(elapsedTime));
             $("#bitrate").text(bitrate.toFixed(0)+" kbps");
             $("#buffer").text(buffer.toFixed(2)+" s");
             $("#frag").text(formatBytes(bytes));
@@ -153,6 +157,8 @@ $('#streamModal').on('hidden.bs.modal', function () {
     $('video').trigger('pause');
     totalBytes=0;
     fragStartTime=0;
+    startTime=0;
+    clearInterval(timer);
 });
 
 $('#checkAllStatus').click(() => {
