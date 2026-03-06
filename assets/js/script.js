@@ -94,7 +94,7 @@ let check=(id, channelName, source) => {
 }
 
 let video=document.querySelector("video");
-let player=new Plyr('#streamTV');
+let player;
 let totalBytes=0;
 let fragStartTime=0;
 let startTime;
@@ -110,17 +110,19 @@ let play=(channelName, source) => {
             lowLatencyMode: true
         });
         hls.loadSource(source);
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 
             const availableQualities=hls.levels.map((l) => l.height)
-
+            console.log(availableQualities);
             defaultOptions.quality={
                 default: availableQualities[0],
                 options: availableQualities,
                 forced: true,
-                onChange: (e) => updateQuality(e),
+                onChange: updateQuality
             }
             player=new Plyr(video, defaultOptions);
+            player.play();
         });
         startTime=Date.now();
         hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
@@ -144,13 +146,12 @@ let play=(channelName, source) => {
             $("#buffer").text(buffer.toFixed(2)+" s");
             $("#frag").text(formatBytes(bytes));
         });
-        hls.attachMedia(video);
         window.hls=hls;
     } else {
         console.log('Hls not supported');
         player=new Plyr(video, defaultOptions);
+        player.play();
     }
-    player.play();
 }
 
 $('#streamModal').on('hidden.bs.modal', function () {
