@@ -56,6 +56,17 @@ let formatSpeed=(bytesPerSec) => {
     return bytesPerSec.toFixed(2)+" "+units[i];
 }
 
+let formatElapsedTime=(seconds) => {
+    seconds=Math.floor(seconds);
+    const hrs=Math.floor(seconds/3600);
+    const mins=Math.floor((seconds%3600)/60);
+    const secs=seconds%60;
+    const h=String(hrs).padStart(2, '0');
+    const m=String(mins).padStart(2, '0');
+    const s=String(secs).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+}
+
 let check=(id, channelName, source) => {
     $.ajax({
         url: source,
@@ -86,6 +97,7 @@ let video=document.querySelector("video");
 let player=new Plyr('#streamTV');
 let totalBytes=0;
 let fragStartTime=0;
+let startTime = Date.now();
 let play=(channelName, source) => {
     $('#streamModalLabel').html(channelName);
     const defaultOptions={};
@@ -110,19 +122,20 @@ let play=(channelName, source) => {
             player=new Plyr(video, defaultOptions);
         });
         hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
-            // console.log(event);
-            // console.log(data);
             const bytes=data.frag.stats.loaded;
             totalBytes+=bytes;
-            // const duration=(data.frag.stats.loading.end-data.frag.stats.loading.first)/1000;
             const now=Date.now();
             const duration=(now-fragStartTime)/1000;
             fragStartTime=Date.now();
             const speed=duration>0? (bytes/duration):0;
             const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
             const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
+            const elapsedTime = (Date.now() - startTime) / 1000;
             $("#total").text(formatBytes(totalBytes));
+            $("#frag").text(formatBytes(bytes));
+            $("#duration").text(duration.toFixed(3)+' s');
             $("#speed").text(formatSpeed(speed));
+            $("#elapsedTime").text(formatElapsedTime(elapsedTime));
             $("#bitrate").text(bitrate.toFixed(0)+" kbps");
             $("#buffer").text(buffer.toFixed(2)+" s");
             $("#frag").text(formatBytes(bytes));
