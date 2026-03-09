@@ -28,12 +28,16 @@ let getCountries=async () => {
 }
 
 let updateQuality=(newQuality) => {
-    window.hls.levels.forEach((level, levelIndex) => {
-        if (level.height===newQuality) {
-            console.log("Found quality match with "+newQuality);
-            window.hls.currentLevel=levelIndex;
-        }
-    });
+    if (newQuality===0) {
+        window.hls.currentLevel=-1;
+    } else {
+        window.hls.levels.forEach((level, levelIndex) => {
+            if (level.height===newQuality) {
+                console.log("Found quality match with "+newQuality);
+                window.hls.currentLevel=levelIndex;
+            }
+        });
+    }
 }
 
 let formatBytes=(bytes) => {
@@ -114,12 +118,18 @@ let play=(channelName, source) => {
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 
             const availableQualities=hls.levels.map((l) => l.height)
+            availableQualities.unshift(0);
             console.log(availableQualities);
             defaultOptions.quality={
                 default: availableQualities[0],
                 options: availableQualities,
                 forced: true,
                 onChange: updateQuality
+            }
+            defaultOptions.i18n={
+                qualityLabel: {
+                    0: 'Auto'
+                }
             }
             player=new Plyr(video, defaultOptions);
             player.play();
