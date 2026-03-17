@@ -204,6 +204,7 @@ $('#checkAllStatus').click(() => {
             let country=`${countryData.flag} ${countryData.name}`;
             streamData.url=streamData.url.replace('http://', 'https://');
             channelData.name=channelData.name.replace(`'`, ``);
+            streamData.url='https://globalapi.netlify.app/api/stream/get?src='+encodeURIComponent(streamData.url);
             let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
