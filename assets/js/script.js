@@ -41,15 +41,36 @@ let updateQualityHls = (newQuality) => {
 }
 
 let updateQualityDash = (newQuality, dashInstance) => {
+    const qualities = dashInstance.getRepresentationsByType('video') || [];
     if (newQuality === 0) {
-        dashInstance.setAutoSwitchQualityFor("video", true);
-    } else {
-        dashInstance.setAutoSwitchQualityFor("video", false);
-        const qualities = dashInstance.getRepresentationsByType('video');
-        const index = qualities.findIndex(q => q.height === newQuality);
+        dashInstance.updateSettings({
+            streaming: {
+                abr: {
+                    autoSwitchBitrate: {
+                        video: true
+                    }
+                }
+            }
+        });
 
+        return;
+    } else {
+        dashInstance.updateSettings({
+            streaming: {
+                abr: {
+                    autoSwitchBitrate: {
+                        video: false
+                    }
+                }
+            }
+        });
+
+        // find matching quality
+        const index = qualities.findIndex(q => q.height === newQuality);
         if (index !== -1) {
             dashInstance.setQualityFor("video", index);
+        } else {
+            console.warn("Quality not found:", newQuality, qualities);
         }
     }
 }
