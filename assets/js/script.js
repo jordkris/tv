@@ -1,4 +1,4 @@
-commentBox('5639883179687936-proj')
+// commentBox('5639883179687936-proj')
 
 let promise = async(url) => {
     return new Promise((resolve, reject) => {
@@ -47,7 +47,8 @@ let updateQualityDash = (newQuality, dashInstance) => {
             streaming: {
                 abr: {
                     autoSwitchBitrate: {
-                        video: true
+                        video: true,
+                        audio: true
                     }
                 }
             }
@@ -55,20 +56,19 @@ let updateQualityDash = (newQuality, dashInstance) => {
 
         return;
     } else {
-        dashInstance.updateSettings({
+        dash.updateSettings({
             streaming: {
                 abr: {
                     autoSwitchBitrate: {
-                        video: false
+                        video: false,
+                        audio: false
                     }
                 }
             }
         });
-
-        // find matching quality
-        const index = qualities.findIndex(q => q.height === newQuality);
-        if (index !== -1) {
-            dashInstance.setQualityFor("video", index);
+        const chosenQuality = qualities.find(q => q.height === newQuality);
+        if (chosenQuality !== undefined) {
+            dashInstance.setRepresentationForTypeById('video', chosenQuality.id);
         } else {
             console.warn("Quality not found:", newQuality, qualities);
         }
