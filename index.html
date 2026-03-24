@@ -15,8 +15,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
@@ -59,8 +58,7 @@
     <!-- End Header -->
 
     <!-- ======= Hero Section ======= -->
-    <section id="hero" class="hero d-flex flex-column justify-content-center align-items-center" data-aos="fade"
-        data-aos-delay="1500">
+    <section id="hero" class="hero d-flex flex-column justify-content-center align-items-center" data-aos="fade" data-aos-delay="1500">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6 text-center">
@@ -114,19 +112,20 @@
         <div id="disqus_thread"></div>
         <script>
             /**
-            *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-            *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+             *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
             /*
             var disqus_config = function () {
             this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
             this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
             };
             */
-            (function () { // DON'T EDIT BELOW THIS LINE
-                var d=document, s=d.createElement('script');
-                s.src='https://free-all-tv.disqus.com/embed.js';
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document,
+                    s = d.createElement('script');
+                s.src = 'https://free-all-tv.disqus.com/embed.js';
                 s.setAttribute('data-timestamp', +new Date());
-                (d.head||d.body).appendChild(s);
+                (d.head || d.body).appendChild(s);
             })();
         </script>
         <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
@@ -149,8 +148,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="streamModal" tabindex="-1" role="dialog" aria-labelledby="streamModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="streamModal" tabindex="-1" role="dialog" aria-labelledby="streamModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -161,19 +159,14 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <video id="streamTV" controls crossorigin playsinline>
-                                <source type="application/x-mpegURL" />
+                                <!-- <source type="application/x-mpegURL" /> -->
                             </video>
                         </div>
                         <div class="col-lg-6 text-dark">
-                            Download: <span id="total">0 KB</span><br>
-                            Fragment: <span id="frag">0 KB</span><br>
-                            Loading Duration: <span id="duration">0 s</span><br>
-                            Speed: <span id="speed">0 KB/s</span>
+                            Download: <span id="total">0 KB</span><br> Fragment: <span id="frag">0 KB</span><br> Loading Duration: <span id="duration">0 s</span><br> Speed: <span id="speed">0 KB/s</span>
                         </div>
                         <div class="col-lg-6 text-dark">
-                            Elapsed Time: <span id="elapsedTime">00:00:00</span><br>
-                            Bitrate: <span id="bitrate">0 kbps</span><br>
-                            Buffer: <span id="buffer">0 s</span><br>
+                            Elapsed Time: <span id="elapsedTime">00:00:00</span><br> Bitrate: <span id="bitrate">0 kbps</span><br> Buffer: <span id="buffer">0 s</span><br>
                         </div>
                     </div>
                 </div>
@@ -186,8 +179,7 @@
 
     <!-- Toast-->
     <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
-        <div id="streamToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true"
-            data-delay="4000">
+        <div id="streamToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000">
             <div class="toast-header d-flex justify-content-between">
                 <div>
                     <img src="assets/img/favicon.png" class="rounded mr-2" alt="..." width="15">
@@ -213,6 +205,8 @@
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.jqueryui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.plyr.io/3.7.7/plyr.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
 

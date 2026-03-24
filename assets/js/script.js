@@ -1,6 +1,6 @@
 commentBox('5639883179687936-proj')
 
-let promise=async (url) => {
+let promise = async(url) => {
     return new Promise((resolve, reject) => {
         $.ajax({
             url: url,
@@ -15,63 +15,77 @@ let promise=async (url) => {
     });
 }
 
-let getChannels=async () => {
+let getChannels = async() => {
     return await promise('https://iptv-org.github.io/api/channels.json');
 }
 
-let getStreams=async () => {
+let getStreams = async() => {
     return await promise('https://iptv-org.github.io/api/streams.json');
 }
 
-let getCountries=async () => {
+let getCountries = async() => {
     return await promise('https://iptv-org.github.io/api/countries.json');
 }
 
-let updateQuality=(newQuality) => {
-    if (newQuality===0) {
-        window.hls.currentLevel=-1;
+let updateQualityHls = (newQuality) => {
+    if (newQuality === 0) {
+        window.hls.currentLevel = -1;
     } else {
         window.hls.levels.forEach((level, levelIndex) => {
-            if (level.height===newQuality) {
-                console.log("Found quality match with "+newQuality);
-                window.hls.currentLevel=levelIndex;
+            if (level.height === newQuality) {
+                console.log("Found quality match with " + newQuality);
+                window.hls.currentLevel = levelIndex;
             }
         });
     }
 }
 
-let formatBytes=(bytes) => {
-    const units=["B", "KB", "MB", "GB", "TB"];
-    let i=0;
-    while (bytes>=1000&&i<units.length-1) {
-        bytes/=1000;
-        i++;
+let updateQualityDash = (newQuality, dashInstance) => {
+    if (newQuality === 0) {
+        dashInstance.setAutoSwitchQualityFor("video", true);
+    } else {
+        dashInstance.setAutoSwitchQualityFor("video", false);
+        const qualities = dashInstance.getRepresentationsByType('video');
+        const index = qualities.findIndex(q => q.height === newQuality);
+
+        if (index !== -1) {
+            dashInstance.setQualityFor("video", index);
+        }
     }
-    return bytes.toFixed(2)+" "+units[i];
 }
 
-let formatSpeed=(bytesPerSec) => {
-    const units=["B/s", "KB/s", "MB/s", "GB/s"];
-    let i=0;
-    while (bytesPerSec>=1000&&i<units.length-1) {
-        bytesPerSec/=1000;
+let formatBytes = (bytes) => {
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let i = 0;
+    while (bytes >= 1000 && i < units.length - 1) {
+        bytes /= 1000;
         i++;
     }
-    return bytesPerSec.toFixed(2)+" "+units[i];
+    return bytes.toFixed(2) + " " + units[i];
 }
 
-let formatElapsedTime=(seconds) => {
-    seconds=Math.floor(seconds);
-    const hrs=Math.floor(seconds/3600);
-    const mins=Math.floor((seconds%3600)/60);
-    const secs=seconds%60;
-    const h=String(hrs).padStart(2, '0');
-    const m=String(mins).padStart(2, '0');
-    const s=String(secs).padStart(2, '0');
+let formatSpeed = (bytesPerSec) => {
+    const units = ["B/s", "KB/s", "MB/s", "GB/s"];
+    let i = 0;
+    while (bytesPerSec >= 1000 && i < units.length - 1) {
+        bytesPerSec /= 1000;
+        i++;
+    }
+    return bytesPerSec.toFixed(2) + " " + units[i];
+}
+
+let formatElapsedTime = (seconds) => {
+    seconds = Math.floor(seconds);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    const h = String(hrs).padStart(2, '0');
+    const m = String(mins).padStart(2, '0');
+    const s = String(secs).padStart(2, '0');
     return `${h}:${m}:${s}`;
 }
 
-let check=(id, channelName, source) => {
+let check = (id, channelName, source) => {
     $.ajax({
         url: source,
         type: 'GET',
@@ -97,78 +111,140 @@ let check=(id, channelName, source) => {
     });
 }
 
-let video=document.querySelector("video");
+let video = document.querySelector("video");
 let player;
-let totalBytes=0;
-let fragStartTime=0;
+let totalBytes = 0;
+let fragStartTime = 0;
 let startTime;
 let timer;
-let play=(channelName, source) => {
+let play = (channelName, source) => {
     $('#streamModalLabel').html(channelName);
-    const defaultOptions={};
+    const defaultOptions = {};
+    if (source.includes('.mpd')) {
+        console.log('DASH supported');
+        const dash = dashjs.MediaPlayer().create();
+        dash.updateSettings({
+            streaming: {
+                delay: {
+                    liveDelay: 3
+                },
+                liveCatchup: {
+                    enabled: true
+                }
+            }
+        });
+        dash.initialize(video, source, true);
+        dash.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
+            const qualities = dash.getRepresentationsByType('video');;
+            const availableQualities = qualities.map(q => q.height);
+            availableQualities.unshift(0);
+            console.log(availableQualities);
+            defaultOptions.quality = {
+                default: availableQualities[0],
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => updateQualityDash(newQuality, dash)
+            };
+            defaultOptions.i18n = {
+                qualityLabel: {
+                    0: 'Auto'
+                }
+            };
+            player = new Plyr(video, defaultOptions);
+            player.play();
+        });
 
-    if (Hls.isSupported()) {
+        startTime = Date.now();
+        dash.on(dashjs.MediaPlayer.events.FRAGMENT_LOADING_COMPLETED, function(e) {
+            if (!e || !e.request || !e.request.bytesLoaded) return;
+            const bytes = e.request.bytesLoaded;
+            totalBytes += bytes;
+            const now = Date.now();
+            const duration = (now - fragStartTime) / 1000;
+            fragStartTime = now;
+            const speed = duration > 0 ? (bytes / duration) : 0;
+            // const qualities = dash.getBitrateInfoListFor("video");
+            // const currentIndex = dash.getQualityFor("video");
+            // const bitrate = qualities[currentIndex] ? bitrate : 0;
+            const buffer = video.buffered.length ?
+                video.buffered.end(0) - video.currentTime :
+                0;
+            if (!timer) {
+                timer = setInterval(() => {
+                    let elapsedTime = (Date.now() - startTime) / 1000;
+                    $("#elapsedTime").text(formatElapsedTime(elapsedTime));
+                }, 1000);
+            }
+            $("#total").text(formatBytes(totalBytes));
+            $("#frag").text(formatBytes(bytes));
+            $("#duration").text(duration.toFixed(3) + ' s');
+            $("#speed").text(formatSpeed(speed));
+            // $("#bitrate").text(bitrate.toFixed(0) + " kbps");
+            $("#buffer").text(buffer.toFixed(2) + " s");
+        });
+        window.dash = dash;
+    } else if (Hls.isSupported() && source.includes('.m3u8')) {
         console.log('Hls supported');
-        const hls=new Hls({
+        const hls = new Hls({
             enableWorker: true,
             lowLatencyMode: true
         });
         hls.loadSource(source);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-
-            const availableQualities=hls.levels.map((l) => l.height)
+        hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+            const availableQualities = hls.levels.map((l) => l.height)
             availableQualities.unshift(0);
             console.log(availableQualities);
-            defaultOptions.quality={
+            defaultOptions.quality = {
                 default: availableQualities[0],
                 options: availableQualities,
                 forced: true,
-                onChange: updateQuality
+                onChange: updateQualityHls
             }
-            defaultOptions.i18n={
+            defaultOptions.i18n = {
                 qualityLabel: {
                     0: 'Auto'
                 }
             }
-            player=new Plyr(video, defaultOptions);
+            player = new Plyr(video, defaultOptions);
             player.play();
         });
-        startTime=Date.now();
+        startTime = Date.now();
         hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
-            const bytes=data.frag.stats.loaded;
-            totalBytes+=bytes;
-            const now=Date.now();
-            const duration=(now-fragStartTime)/1000;
-            fragStartTime=Date.now();
-            const speed=duration>0? (bytes/duration):0;
-            const bitrate=data.frag.bitrate? data.frag.bitrate/1000:0;
-            const buffer=video.buffered.length? video.buffered.end(0)-video.currentTime:0;
-            timer=setInterval(() => {
-                let elapsedTime=(Date.now()-startTime)/1000;
+            const bytes = data.frag.stats.loaded;
+            totalBytes += bytes;
+            const now = Date.now();
+            const duration = (now - fragStartTime) / 1000;
+            fragStartTime = Date.now();
+            const speed = duration > 0 ? (bytes / duration) : 0;
+            const bitrate = data.frag.bitrate ? data.frag.bitrate / 1000 : 0;
+            const buffer = video.buffered.length ? video.buffered.end(0) - video.currentTime : 0;
+            timer = setInterval(() => {
+                let elapsedTime = (Date.now() - startTime) / 1000;
                 $("#elapsedTime").text(formatElapsedTime(elapsedTime));
             }, 1000);
             $("#total").text(formatBytes(totalBytes));
             $("#frag").text(formatBytes(bytes));
-            $("#duration").text(duration.toFixed(3)+' s');
+            $("#duration").text(duration.toFixed(3) + ' s');
             $("#speed").text(formatSpeed(speed));
-            $("#bitrate").text(bitrate.toFixed(0)+" kbps");
-            $("#buffer").text(buffer.toFixed(2)+" s");
+            $("#bitrate").text(bitrate.toFixed(0) + " kbps");
+            $("#buffer").text(buffer.toFixed(2) + " s");
             $("#frag").text(formatBytes(bytes));
         });
-        window.hls=hls;
+        window.hls = hls;
     } else {
-        console.log('Hls not supported');
-        player=new Plyr(video, defaultOptions);
+        console.log('Hls & Dash not supported');
+        player = new Plyr(video, defaultOptions);
         player.play();
     }
+
 }
 
-$('#streamModal').on('hidden.bs.modal', function () {
+$('#streamModal').on('hidden.bs.modal', function() {
     $('video').trigger('pause');
-    totalBytes=0;
-    fragStartTime=0;
-    startTime=0;
+    totalBytes = 0;
+    fragStartTime = 0;
+    startTime = 0;
     clearInterval(timer);
 });
 
@@ -176,12 +252,12 @@ $('#checkAllStatus').click(() => {
     $('.checkStatus').click();
 });
 
-(async () => {
-    let channels=await getChannels();
-    let streams=await getStreams();
-    let countries=await getCountries();
+(async() => {
+    let channels = await getChannels();
+    let streams = await getStreams();
+    let countries = await getCountries();
 
-    let t=$('#all-tv').DataTable({
+    let t = $('#all-tv').DataTable({
         initComplete: () => {
             $('#loading').remove();
         },
@@ -190,22 +266,22 @@ $('#checkAllStatus').click(() => {
             [10, 25, 50, 100, 500, 1000]
         ]
     });
-    let counter=1;
+    let counter = 1;
     channels.forEach((channelData) => {
-        let streamData=streams.filter(stream => stream.channel===channelData.id)[0]||'';
-        let countryData=countries.filter(country => country.code===channelData.country)[0]||'';
-        if (streamData&&countryData) {
-            let channel=channelData.website? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>`:channelData.name;
-            let logo=`
+        let streamData = streams.filter(stream => stream.channel === channelData.id)[0] || '';
+        let countryData = countries.filter(country => country.code === channelData.country)[0] || '';
+        if (streamData && countryData) {
+            let channel = channelData.website ? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>` : channelData.name;
+            let logo = `
                     <div class="magic-box">
                         <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/tv/assets/img/no-image.png';" />
                     </div>
                 `;
-            let country=`${countryData.flag} ${countryData.name}`;
-            streamData.url=streamData.url.replace('http://', 'https://');
-            channelData.name=channelData.name.replace(`'`, ``);
-            streamData.url='https://globalapi.netlify.app/api/stream/get?src='+encodeURIComponent(streamData.url);
-            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            let country = `${countryData.flag} ${countryData.name}`;
+            streamData.url = streamData.url.replace('http://', 'https://');
+            channelData.name = channelData.name.replace(`'`, ``);
+            streamData.url = 'https://globalapi.netlify.app/api/stream/get?src=' + encodeURIComponent(streamData.url);
+            let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
                 channel,
@@ -217,15 +293,15 @@ $('#checkAllStatus').click(() => {
         }
     });
     streams.forEach((streamData) => {
-        if (!streamData.channel&&streamData.url) {
-            let url=new URL(streamData.url);
-            let channel=`<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
-            let logo=`
+        if (!streamData.channel && streamData.url) {
+            let url = new URL(streamData.url);
+            let channel = `<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
+            let logo = `
                 <div class="magic-box">
                     <img src="/tv/assets/img/no-image.png" class="magic-image"  />
                 </div>
             `;
-            let stream=`<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${url.hostname}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
+            let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${url.hostname}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
                 channel,
