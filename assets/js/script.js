@@ -47,8 +47,7 @@ let updateQualityDash = (newQuality, dashInstance) => {
             streaming: {
                 abr: {
                     autoSwitchBitrate: {
-                        video: true,
-                        audio: true
+                        video: true
                     }
                 }
             }
@@ -60,8 +59,7 @@ let updateQualityDash = (newQuality, dashInstance) => {
             streaming: {
                 abr: {
                     autoSwitchBitrate: {
-                        video: false,
-                        audio: false
+                        video: false
                     }
                 }
             }
