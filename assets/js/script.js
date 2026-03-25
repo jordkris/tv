@@ -154,22 +154,23 @@ let play = (channelName, source) => {
         });
         dash.initialize(video, source, true);
         dash.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
-            const qualities = dash.getRepresentationsByType('video');;
-            const availableQualities = qualities.map(q => q.height);
-            availableQualities.unshift(0);
-            console.log(availableQualities);
-            defaultOptions.quality = {
-                default: availableQualities[0],
-                options: availableQualities,
-                forced: true,
-                onChange: (newQuality) => updateQualityDash(newQuality, dash)
-            };
-            defaultOptions.i18n = {
-                qualityLabel: {
-                    0: 'Auto'
-                }
-            };
-            player = new Plyr(video, defaultOptions);
+            // const qualities = dash.getRepresentationsByType('video');;
+            // const availableQualities = qualities.map(q => q.height);
+            // availableQualities.unshift(0);
+            // console.log(availableQualities);
+            // defaultOptions.quality = {
+            //     default: availableQualities[0],
+            //     options: availableQualities,
+            //     forced: true,
+            //     onChange: (newQuality) => updateQualityDash(newQuality, dash)
+            // };
+            // defaultOptions.i18n = {
+            //     qualityLabel: {
+            //         0: 'Auto'
+            //     }
+            // };
+            // player = new Plyr(video, defaultOptions);
+            player = new Plyr(video);
             player.play();
         });
 
@@ -291,14 +292,15 @@ $('#checkAllStatus').click(() => {
         let countryData = countries.filter(country => country.code === channelData.country)[0] || '';
         if (streamData && countryData) {
             let channel = channelData.website ? `<a href="${channelData.website}" target="_blank">${channelData.name}</a>` : channelData.name;
-            let logo = `
+            let logo = `<a href="${channelData.logo}">
                     <div class="magic-box">
                         <img src="${channelData.logo}" class="magic-image" onError="this.onerror=null;this.src='/tv/assets/img/no-image.png';" />
                     </div>
-                `;
+                </a>`;
             let country = `${countryData.flag} ${countryData.name}`;
             streamData.url = streamData.url.replace('http://', 'https://');
             channelData.name = channelData.name.replace(`'`, ``);
+            let originalUrl = streamData.url;
             streamData.url = 'https://globalapi.netlify.app/api/stream/get?src=' + encodeURIComponent(streamData.url);
             let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${channelData.name}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
@@ -306,6 +308,7 @@ $('#checkAllStatus').click(() => {
                 channel,
                 logo,
                 country,
+                originalUrl,
                 stream
             ]);
             counter++;
@@ -315,17 +318,20 @@ $('#checkAllStatus').click(() => {
         if (!streamData.channel && streamData.url) {
             let url = new URL(streamData.url);
             let channel = `<a href="${url.origin}" target="_blank">${url.hostname}</a>`;
-            let logo = `
+            let logo = `<a href="/tv/assets/img/no-image.png">
                 <div class="magic-box">
                     <img src="/tv/assets/img/no-image.png" class="magic-image"  />
                 </div>
-            `;
+            </a>`;
+            let originalUrl = streamData.url;
+            streamData.url = 'https://globalapi.netlify.app/api/stream/get?src=' + encodeURIComponent(streamData.url);
             let stream = `<div id="stream-${counter}"><button class="btn btn-primary checkStatus" onclick="check('stream-${counter}','${url.hostname}','${streamData.url}')">Check Status <i class="bi bi-shield-check"></i></button></div>`;
             t.row.add([
                 counter,
                 channel,
                 logo,
                 'Unknown',
+                originalUrl,
                 stream
             ]);
             counter++;
