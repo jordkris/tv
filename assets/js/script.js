@@ -142,16 +142,16 @@ let play = (channelName, source) => {
     if (source.includes('.mpd')) {
         console.log('DASH supported');
         const dash = dashjs.MediaPlayer().create();
-        dash.updateSettings({
-            streaming: {
-                delay: {
-                    liveDelay: 3
-                },
-                liveCatchup: {
-                    enabled: true
-                }
-            }
-        });
+        // dash.updateSettings({
+        //     streaming: {
+        //         delay: {
+        //             liveDelay: 3
+        //         },
+        //         liveCatchup: {
+        //             enabled: true
+        //         }
+        //     }
+        // });
         dash.initialize(video, source, true);
         dash.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, function() {
             // const qualities = dash.getRepresentationsByType('video');;
